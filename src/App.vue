@@ -1,9 +1,10 @@
 <template>
   <div>
     <p>
-      {{ loggedInUser ? `Your UserName is ${loggedInUser.name} and your UserID is ${loggedInUser.id}` : 'Not logged in' }}
+      {{ loggedInUser ? `Your UserName is ${loggedInUser.name}` : 'Not logged in' }}
     </p>
-
+    <v-col>
+      <v-row>
     <form>
       <input type="email" placeholder="Email" v-model="email" />
       <input type="password" placeholder="Password" v-model="password" />
@@ -12,7 +13,8 @@
 
       <button type="button" @click="logout">Logout</button>
     </form>
-
+    </v-row>
+    </v-col>
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
       {{ snackbar.message }}
     </v-snackbar>
@@ -21,12 +23,13 @@
 
 <script setup>
 import { ref } from 'vue';
-import { account, ID } from './main.js';
+import { account, ID, client } from './main.js';
+import { Functions } from 'appwrite';
 
 const loggedInUser = ref(null);
 const email = ref('');
 const password = ref('');
-const name = ref('');
+const username = ref('');
 const snackbar = ref({
   show: false,
   message: '',
@@ -38,22 +41,23 @@ const login = async (email, password) => {
   try {
     await account.createEmailSession(email, password);
     loggedInUser.value = await account.get();
-    clearSnackbar()
-  } catch (error) {
+    clearSnackbar();
+
+    const functions = new Functions(client);
+    const promise = functions.createExecution('651c9fbf4c973f6772f8');
+
+      promise.then(function (response) {
+       console.log(response); // Success
+    }, function (error) {
+        console.log(error); // Failure
+    });
+}
+  catch (error) {
     showSnackbar('Login failed. Please check your credentials.', 'error');
   }
 };
 
-// const register = async () => {
-//   try {
-//     await account.create(ID.unique(), email.value, password.value, name.value);
-//     login(email.value, password.value);
-//     clearSnackbar()
-//   } catch (error) {
-//     showSnackbar('Registration failed. User with the same ID may exist.', 'error');
 
-//   }
-// };
 
 const logout = async () => {
   await account.deleteSession('current');
@@ -61,6 +65,7 @@ const logout = async () => {
   // Clear the form fields and error message on logout
   email.value = '';
   password.value = '';
+  username.value = '';
 };
 const showSnackbar = (message, color) => {
   snackbar.value.message = message;
@@ -74,6 +79,7 @@ const clearSnackbar = () => {
 </script>
 
 <style scoped>
+
 .error-popup {
   background-color: #ffcccc;
   padding: 10px;
@@ -82,3 +88,13 @@ const clearSnackbar = () => {
   margin-top: 10px;
 }
 </style>
+<!-- const register = async () => {
+  try {
+    await account.create(ID.unique(), email.value, password.value, username.value);
+    login(email.value, password.value);
+    clearSnackbar()
+  } catch (error) {
+    showSnackbar('Registration failed. User with the same ID may exist.', 'error');
+
+  }
+}; -->

@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import { Client, Account} from 'appwrite';
+import { Client, Account, Functions} from 'appwrite';
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -15,8 +15,8 @@ const vuetify = createVuetify({
   })
 
 client
-    .setEndpoint('https://appwrite143.tokyo.cakeshop.dev/v1')
-    .setProject('65140c7226959c374eff'); // Replace with your project ID
+    .setEndpoint('https://helsinki.cakeshop.dev/v1')
+    .setProject('651b1911cc85641c6855');
 
 export const account = new Account(client);
 export { ID } from 'appwrite';
